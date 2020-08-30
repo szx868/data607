@@ -1,5 +1,5 @@
 ---
-title: "How popular is Donald Trump before and after Convid19?
+title: "How popular is Donald Trump before and after Convid-19?
 "
 output: html_document
 ---
