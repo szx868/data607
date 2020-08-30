@@ -1,0 +1,71 @@
+---
+title: "How popular is Donald Trump before and after Convid19?
+"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+An calculation of the president's approval rating before convid19 and after convid19:
+The link of article is provide as below
+https://projects.fivethirtyeight.com/trump-approval-ratings/
+
+
+### Step 1:
+pulling data from online excel sheet
+```{r }
+polls <- read.csv('https://projects.fivethirtyeight.com/trump-approval-data/approval_topline.csv')
+head(polls)
+```
+### Step 2:
+pick the columns you need, this case we only looking for date and approve estimate and disapprove estimate.
+
+```{r}
+polls <- polls[c('modeldate','approve_estimate','disapprove_estimate')]
+head(polls)
+
+```
+### Step 3:
+Convert modeldate column from chr to date, so we filter out data 
+```{r}
+polls$modeldate <- as.Date(polls$modeldate,
+                                     format = "%m/%d/%y")
+
+sorted.polls <- order(polls['modeldate'])
+head(polls[sorted.polls,])
+
+
+```
+
+### Step 4:
+Extract subset of data prior national emergency date(2020-03-13)
+Extract subset of data after national emergency date(2020-03-13)
+Renaming the columns to 'approve' and disapprove'
+
+```{r}
+polls.beforeConvid <- subset(polls,subset = modeldate<as.Date("2020-03-13"))
+polls.afterConvid <- subset(polls,subset = modeldate>=as.Date("2020-03-13"))
+polls.afterConvid <- polls.afterConvid[c('approve_estimate','disapprove_estimate')]
+polls.beforeConvid <- polls.beforeConvid[c('approve_estimate','disapprove_estimate')]
+colnames(polls.beforeConvid) <- c('approve', 'disappove')
+colnames(polls.afterConvid) <- c('approve', 'disappove')
+
+```
+
+### Step 5:
+compare summary of two data frame
+```{r}
+summary(polls.beforeConvid)
+summary(polls.afterConvid)
+```
+
+### Conclusion
+
+Based on those data it look like the popularity of Trump is not effected a lot by Convid-19 when you compare mean of Approve and mean of Disapprove. To have a more accurate result, I would recommend to take another static for different subgroup(Voters,All Polls, Adults)
+
+
+
