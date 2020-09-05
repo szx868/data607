@@ -1,0 +1,65 @@
+---
+title: "Assignment2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+- What is most popular marvel film in past two years.
+
+Choose six recent popular movies. Ask at least five people that you know (friends, family, classmates, imaginary
+friends if necessary) to rate each of these movies that they have seen on a scale of 1 to 5. Take the results (observations) and store them in a SQL database of your choosing. Load the information from the SQL database
+into an R dataframe.
+
+
+### install and import libary we need
+```{r cars}
+library(RMySQL)
+library(dplyr)
+library(dbplyr)
+
+```
+
+### Connect to MySQL database running on the cloud
+- link: https://www.clever-cloud.com/en/
+
+```{r}
+con <- DBI::dbConnect(RMySQL::MySQL(), dbname = "bk6qen7oifdtyy7vpeye", user="ulf4pfcs31h79txp", password="FcoDCm1FgFK1krECMfaN",host="bk6qen7oifdtyy7vpeye-mysql.services.clever-cloud.com")
+
+#get info on the database
+src_dbi(con)
+```
+```{r}
+movies_ratings <- tbl(con, sql("select movie_title,person_name,rating from movie_ratings,movies,person where movie_ratings.movie_id= movies.movie_id
+and movie_ratings.person_id=person.person_id order by movie_ratings.person_id,movie_ratings.movie_id"))
+movies_ratings_df <- as.data.frame(movies_ratings)
+movies_ratings_df
+
+
+
+```
+### Find the average rating by filter out those rating of zero
+```{r}
+movies_avg <-tbl(con, sql("select movie_title as Movie,avg(rating) as Average from movie_ratings,movies,person where movie_ratings.movie_id= movies.movie_id
+and movie_ratings.person_id=person.person_id and movie_ratings.rating >0 group by movie_title"))
+movies_avg_df<-as.data.frame(movies_avg)
+movies_avg_df
+```
+
+### draw an bar graph to visualize 
+```{r}
+library(ggplot2)
+# Basic barplot
+p<-ggplot(data=movies_avg_df, aes(x=Movie, y=Average)) +
+ geom_bar(stat="identity")
+p
+```
+
+### Inconclusion 
+As show above, Avengers: Infinity War	is most popular marvel films 
+
+
