@@ -33,13 +33,26 @@ con <- DBI::dbConnect(RMySQL::MySQL(), dbname = "bk6qen7oifdtyy7vpeye", user="ul
 #get info on the database
 src_dbi(con)
 ```
+
+### Three table created for normalization 
+```{r}
+#movies table
+movies <- tbl(con, sql("SELECT movie_id, movie_title, movie_year FROM movies"))
+movies
+```
+```{r}
+#ratings table
+ratings <- tbl(con, sql("SELECT * FROM movie_ratings"))
+```
+```{r}
+person  <- tbl(con, sql("SELECT * FROM person"))
+person
+```
 ```{r}
 movies_ratings <- tbl(con, sql("select movie_title,person_name,rating from movie_ratings,movies,person where movie_ratings.movie_id= movies.movie_id
 and movie_ratings.person_id=person.person_id order by movie_ratings.person_id,movie_ratings.movie_id"))
 movies_ratings_df <- as.data.frame(movies_ratings)
 movies_ratings_df
-
-
 
 ```
 ### Find the average rating by filter out those rating of zero
@@ -50,7 +63,7 @@ movies_avg_df<-as.data.frame(movies_avg)
 movies_avg_df
 ```
 
-### draw an bar graph to visualize 
+### draw a bar graph to visualize 
 ```{r}
 library(ggplot2)
 # Basic barplot
