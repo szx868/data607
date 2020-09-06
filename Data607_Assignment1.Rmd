@@ -1,7 +1,8 @@
 ---
-title: "How popular is Donald Trump before and after Convid-19?
-"
-output: html_document
+title: 'How popular is Donald Trump before and after Convid-19? '
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -69,6 +70,7 @@ ggplot(data=polls.beforeConvid, aes(x = modeldate, y = approve_estimate)) +
       labs(title = "Approval Rate Trend for Before Convid")
 
 ```
+
 ### Step 6:
 Renaming the columns to 'approve' and disapprove'
 compare summary of two data frame
