@@ -1,0 +1,97 @@
+---
+title: "Project1_ZhouxinShi"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+In this project, you’re given a text file with chess tournament results where the information has some structure. Your
+job is to create an R Markdown file that generates a .CSV file (that could for example be imported into a SQL database)
+with the following information for all of the players:
+
+```{r}
+tournament.data <- read.csv(paste0("https://raw.githubusercontent.com/szx868/data607/master/Project1/tournamentinfo.txt"), header=F)
+```
+### Remove First Few Rows of headings
+```{r}
+results <- tournament.data[-c(1:3),]
+head(results)
+```
+
+
+### Extraction of the columns using regular expressions
+
+```{r}
+library(stringr)
+player.name <- unlist(str_extract_all(results, "\\w+[^USCF|a-z] ?\\w+ \\w+"))
+player.state <- unlist(str_extract_all(results, "(?:^|\\W)ON | MI | OH(?:$|\\W)"))
+player.points <- unlist(str_extract_all(results, "\\d\\.\\d"))
+pre.rating.step1 <-  unlist(str_extract_all(results, "(R:\\s*)(\\d+)"))
+pre.rating.step1[1]
+pre.rating <- unlist(str_extract_all(pre.rating.step1, "(\\d+)"))
+is.vector(pre.rating)
+```
+
+
+### convert strings to numeric
+
+```{r}
+pre.rating <- as.numeric(pre.rating) 
+pre.rating[1]
+```
+```{r}
+avg.calc.step1 <- unlist(str_extract_all(results, "\\|[0-9].*"))
+avg.calc.step1[16]
+avg.calc.step2 <- str_replace_all(avg.calc.step1, "\\s{1,2}\\|","00|")
+avg.calc.step2[16]
+avg.calc.step3 <- (str_extract_all(avg.calc.step2, "\\s\\d{1,2}"))
+avg.calc.step3[16]
+```
+
+```{r}
+matrix.calc <- matrix(unlist(avg.calc.step3), byrow=TRUE, nrow=length(avg.calc.step3) )
+dim(matrix.calc)
+```
+
+```{r}
+new.matrix <- t(apply(matrix.calc, 1,as.numeric)) 
+dim(new.matrix)
+```
+### Data cleaning
+```{r}
+for (i in 1:nrow(new.matrix)) 
+  {
+  for (j in 1:ncol(new.matrix))
+    {
+    if (new.matrix[i,j] == 0){
+      new.matrix[i,j] = NA
+    }
+    else{
+      new.matrix[i,j] <- pre.rating[new.matrix[i,j]]
+    }
+  }
+}
+```
+
+```{r}
+avg.opponents <- c(rowMeans(new.matrix, na.rm = TRUE))
+
+csv <- data.frame(player.name,player.state, player.points,pre.rating,avg.opponents)
+colnames(csv) <- c("Player Name","Player State", "Total Points", "Player Pre-Rating", "Opponents Rating")
+csv
+```
+
+
+### Export Data to CSV File
+```{r}
+write.csv(csv, "DATA_607_Project1.csv", row.names=FALSE)
+
+```
+
+
