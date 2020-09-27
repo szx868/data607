@@ -1,0 +1,87 @@
+---
+title: "Data607_Assignment5"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+### Which airline city has the best overall performance of on-time flight arrival? 
+
+The chart above describes arrival delays for two airlines across five destinations. Your task is to:
+(1) Create a .CSV file (or optionally, a MySQL database!) that includes all of the information above.
+You’re encouraged to use a “wide” structure similar to how the information appears above, so
+that you can practice tidying and transformations as described below.
+(2) Read the information from your .CSV file into R, and use tidyr and dplyr as needed to tidy
+and transform your data.
+(3) Perform analysis to compare the arrival delays for the two airlines.
+(4) Your code should be in an R Markdown file, posted to rpubs.com, and should include narrative
+descriptions of your data cleanup work, analysis, and conclusions. Please include in your
+homework submission:
+```{r}
+library(tidyr)
+library(dplyr,warn.conflicts = FALSE)
+options(dplyr.summarise.inform = FALSE)
+library(stringr)
+
+
+```
+#### Step 1: Create csv file and upload to github 
+
+#### Step 2: Import csv file from github
+```{r}
+flight.data <- read.csv("https://raw.githubusercontent.com/szx868/data607/master/Assignment5/flight_data.csv", stringsAsFactors = F)
+flight.data[2,1] <- flight.data[1,1]
+flight.data[5,1] <- flight.data[4,1]
+flight.data[,2] <- sapply(flight.data[,2], str_replace, " ", ".")
+flight.data
+
+```
+#### Step2.1 Tidy up data
+```{r}
+tidy.data <- flight.data %>% 
+  na.omit() %>% 
+  rename(airline = X, arrival.type = X.1) %>% 
+  gather("arrival.city", "n", 3:7) %>% 
+  spread(arrival.type, "n") %>% 
+  mutate(total.arrivals = delayed + on.time, on.time.rate.percent = on.time / total.arrivals*100) %>% 
+  arrange(desc(total.arrivals))
+
+tidy.data[,2] <- sapply(tidy.data[,2], str_replace, "\\.", " ")
+tidy.data
+```
+
+#### Step 3: airline analysis  
+-  The best on-time arrival rate of Arrival city
+
+```{r}
+best.airlinecity <-
+tidy.data %>% 
+  filter(on.time.rate.percent == max(on.time.rate.percent))
+best.airlinecity
+```
+
+- The airline that has best on-time arrival rate
+```{r}
+bestairline <- tidy.data %>% 
+  group_by(airline) %>% 
+  summarise(airline.on.time.rate.perecent = sum(on.time) / sum(total.arrivals)*100) %>% 
+  filter(airline.on.time.rate.perecent == max(airline.on.time.rate.perecent))
+bestairline
+```
+
+- Rank their performances from highest to lowest.
+```{r}
+performances <- tidy.data %>% 
+  group_by(arrival.city) %>% 
+  summarise(city.on.time.rate.percent = sum(on.time) / sum(total.arrivals)*100) %>% 
+  mutate(on.time.ranking = min_rank(desc(city.on.time.rate.percent))) %>% 
+  arrange(on.time.ranking)
+performances
+```
+### Inconclusion
+It looks like City Phoenix has best overall on-time arrival rates with 92%
