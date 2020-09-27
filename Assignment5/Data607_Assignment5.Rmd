@@ -1,8 +1,8 @@
 ---
 title: "Data607_Assignment5"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -13,12 +13,16 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Which airline city has the best overall performance of on-time flight arrival? 
 
 The chart above describes arrival delays for two airlines across five destinations. Your task is to:
+
 (1) Create a .CSV file (or optionally, a MySQL database!) that includes all of the information above.
 You’re encouraged to use a “wide” structure similar to how the information appears above, so
 that you can practice tidying and transformations as described below.
+
 (2) Read the information from your .CSV file into R, and use tidyr and dplyr as needed to tidy
 and transform your data.
+
 (3) Perform analysis to compare the arrival delays for the two airlines.
+
 (4) Your code should be in an R Markdown file, posted to rpubs.com, and should include narrative
 descriptions of your data cleanup work, analysis, and conclusions. Please include in your
 homework submission:
