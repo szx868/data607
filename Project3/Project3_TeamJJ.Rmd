@@ -1,0 +1,32 @@
+---
+title: "Project3"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+In God we trust, all others must bring data.” Please use data to answer the question,
+“Which are the most valued data science skills?” Consider your work as an exploration; there is not necessarily a “right
+answer.”
+
+data set from https://www.kaggle.com/elroyggj/indeed-dataset-data-scientistanalystengineer
+
+
+
+```{r cars}
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
