@@ -1,0 +1,278 @@
+---
+title: "Project2_ZhouxinShi"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+ Choose any three of the “wide” datasets identified in the Week 6 Discussion items. (You may
+use your own dataset; please don’t use my Sample Post dataset, since that was used in your
+Week 6 assignment!)
+- load library
+```{r}
+library(dplyr,warn.conflicts = FALSE)
+options(dplyr.summarise.inform = FALSE)
+library(tidyr)
+library(knitr)
+library(ggplot2)
+library(stringr)
+library(DT)
+```
+
+### Dataset 1
+School diversity 
+
+The data is collected so that all the different races are in the same column and their proportions are in another column
+
+Question: what is most popular race in school diversity 
+```{r}
+fileSource <- read.table("https://raw.githubusercontent.com/szx868/data607/master/school_diversity.csv",sep=',',header=TRUE)
+
+
+head(fileSource)
+```
+```{r}
+ names(fileSource) <- c("ID","School.ID", "School.name","State", "Locale","YearsOfSchool","AIAN","Asian","Black","Hispanic","White","Other","Total.pop","Diverse","variance","Int.group")
+ 
+head(fileSource)
+```
+```{r}
+data <- filter(fileSource, Total.pop >=100)
+```
+
+```{r}
+data <- tidyr::gather(fileSource, "race", "percent.rate", 8:12)
+head(data)
+```
+
+```{r}
+part1 <- filter(data,percent.rate !="NA" )
+head(part1)
+```
+
+
+```{r}
+
+part2 <-
+data.frame(part1 %>%  dplyr::filter(Total.pop >= 100 ) %>% 
+  dplyr::group_by(race) %>% dplyr::summarise(percent.rate)) 
+head(part2)
+
+```
+
+```{r}
+target_mean <- 
+  data.frame(part2 %>% dplyr::group_by(race) %>% 
+               summarise(mean = mean(percent.rate)) %>%
+             arrange(desc(mean))
+             )
+
+
+kable(head(target_mean, 6), format="markdown")
+```
+```{r}
+target_mean_ordered <- dplyr::arrange(target_mean, mean)
+
+ggplot(data = target_mean_ordered[1:5,], aes(x=reorder(race,-mean), y=mean)) + 
+  geom_bar(stat="identity", width=0.5, fill="lightblue", 
+           position=position_dodge()) +
+    geom_text(aes(label=round(mean, digits=2)), hjust=1.3, size=3.0, color="white") + 
+    coord_flip() + 
+    ggtitle("School Diversity") +
+    xlab("") + ylab("Population percent Rate") + 
+    theme_minimal()
+```
+
+
+
+
+### In conclusion
+White seems like have most population rate in school diversity
+
+
+
+### Dataset 2
+This dataset relating income to social factors such as Age, Education, race etc.
+The Us Adult income dataset was extracted by Barry Becker from the 1994 US Census Database. The data set consists of anonymous information such as occupation, age, native country, race, capital gain, capital loss, education, work class and more.
+Each row is labelled as either having a salary greater than ">50K" or "<=50K".
+https://www.kaggle.com/johnolafenwa/us-census-data
+
+Question: What age group have more chance to have salary greater than 50k?
+
+
+```{r}
+fileSource <- read.table("https://raw.githubusercontent.com/szx868/data607/master/Project2/adult-training.csv",sep=',')
+
+
+head(fileSource)
+```
+```{r}
+ names(fileSource) <- c("age", "Employed","Number", "Education","YearsOfSchool","MaritalStatus","Profession","Relation","Race","Gender","CapitalGain","CapitalLoss","HoursPerWeek","BirthPlace","Salary")
+ 
+head(fileSource)
+```
+
+
+```{r}
+part1 <-
+data.frame(fileSource %>% dplyr::filter(Salary == " >50K" ) %>% 
+  dplyr::group_by(age) %>% dplyr::summarise(length(Salary)))
+                                            
+                                            
+                                            
+head(part1)
+```
+```{r}
+library(data.table)
+
+agebreaks <- c(0,1,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,500)
+agelabels <- c("0-1","1-4","5-9","10-14","15-19","20-24","25-29","30-34",
+               "35-39","40-44","45-49","50-54","55-59","60-64","65-69",
+               "70-74","75-79","80-84","85+")
+
+setDT(part1)[ , agegroups := cut(part1$age, 
+                                breaks = agebreaks, 
+                                right = FALSE, 
+                                labels = agelabels)]
+
+```
+```{r}
+part2 <-
+data.frame(part1 %>% 
+  dplyr::group_by(agegroups) %>% dplyr::summarise(sum(length.Salary.)))
+                                            
+                                            
+                                            
+part2
+```
+
+
+```{r}
+target <- 
+  data.frame(part2 %>%arrange(desc(sum.length.Salary..))
+             )
+target
+```
+
+
+
+### In conclusion
+It appears that person who are 40 to 44 years old have most population to earn more than 50K
+
+### Dataset 3
+
+This dataset providing recent updates of global economic developments, with coverage of unemployment rate of countries. 
+
+- Question: what country have hightest unemployment rate?
+```{r}
+fileSource <- "https://raw.githubusercontent.com/szx868/data607/master/Project2/Unemployment_Rate.csv"
+
+data = read.table(fileSource, header=TRUE, sep=",", na.strings = c("", "NA"))
+head(data)
+```
+```{r}
+dim(data)
+
+```
+
+```{r}
+data <- data[-1,]
+
+# rename rownames
+row.names(data) <- c(1:30)
+
+# rename first column to "year"
+colnames(data)[1] <- "year"
+
+# get column names for countries
+column_names <- colnames(data)
+
+# clean up column names for each country
+column_names <- 
+#replace the ".." with underscore character
+  sapply(column_names, stringr::str_replace_all, pattern="[.]{2,2}",replacement= "_") %>% 
+  #replace the period at the very end of the string with a blank character
+  sapply(stringr::str_replace_all, pattern="[.]{1,1}$",replacement= "") %>% 
+  #replace "." with underscore character
+  sapply(stringr::str_replace_all, pattern="[.]{1,1}",replacement= "_") %>% 
+  sapply(stringr::str_replace_all, pattern="[_]{2,2}",replacement= "_")
+
+#update country column names with cleaner names
+colnames(data) <- column_names
+
+#preview data in wide format
+kable(head(data[,1:10],10), format="markdown")
+```
+- Transfer into long format
+```{r}
+data <- tidyr::gather(data, "country_name", "annual_unemployment", 2:84)
+
+kable(head(data, 10), format="markdown")
+```
+- create subset that filter out columns that is not country name
+```{r}
+exclude_countries = c(
+"Advanced_Economies",				
+"Egypt_Arab_Rep",				
+"High_Income_Countries",				
+"North_Macedonia",				
+"EMDE_Middle_East_N_Africa",				
+"EMDE_Sub_Saharan_Africa",				
+"World_WBG_members",				
+"South_Africa"
+)
+
+#only include years from 2011 to 2019 and exclude countries that are not actual countries
+part1 <- 
+  data %>%  dplyr::filter(year >= 2011 & year <= 2019) %>% 
+    dplyr::filter(!(country_name %in% exclude_countries))
+
+dplyr::filter(data, country_name %in% exclude_countries) %>% dplyr::distinct(country_name)
+part2 <-
+data.frame(part1 %>%  dplyr::filter(year >= 2011 & year <= 2019) %>% 
+  dplyr::group_by(country_name) %>% dplyr::summarise(length(which(is.na(annual_unemployment))))) 
+
+#rename column to "NA_count" for readability
+colnames(part2) <- c("country_name", "NA_count")
+
+part3 <- dplyr::filter(part2, NA_count == 0)
+
+#only include country names with NA_count = 0.
+#countries with NA_count of 0 are ones with complete data for years 2011 to 2019. 
+target <- 
+  part1 %>% dplyr::filter(country_name %in% part3$country_name)
+```
+
+```{r}
+target_mean <- 
+  data.frame(target %>% dplyr::group_by(country_name) %>% 
+               summarise(mean = mean(annual_unemployment)) %>%
+             arrange(desc(mean))
+             )
+
+kable(head(target_mean, 10), format="markdown")
+```
+
+```{r}
+target_mean_ordered <- dplyr::arrange(target_mean, mean)
+
+ggplot(data = target_mean_ordered[1:10,], aes(x=reorder(country_name,-mean), y=mean)) + 
+  geom_bar(stat="identity", width=0.5, fill="lightblue", 
+           position=position_dodge()) +
+    geom_text(aes(label=round(mean, digits=2)), hjust=1.3, size=3.0, color="white") + 
+    coord_flip() + 
+    ggtitle("2011 - 2019: Top 10 Average Annual Unemployment Rates Countries") +
+    xlab("") + ylab("Unemployment Rate") + 
+    theme_minimal()
+```
+
+
+### In conclusion
+Greece seems like have poor employment rate in recent year from 2011 to 2019
+
+
+
+
