@@ -1,0 +1,23 @@
+{"favorite recent books":[
+	{
+	"Book Title": "Harry Potter and the Sorcerer's Stone",
+	"Authors": "J. K. Rowling",
+	"Cover Type": "Hard",
+	"Subject": "Fiction",
+	"Pages": 256
+	},
+	{
+	"Book Title": "New Moon: The Twilight Saga",
+	"Authors": "Stephenie Meyer",
+	"Cover Type": "Soft",
+	"Subject": "Fiction",
+	"Pages": 512
+	},
+		{
+	"Book Title": "Introduction to Algorithms",
+	"Authors": ["Thomas H.Cormen", "Charles E.Leiserson", "Ronald L.Rivest", "Clifford Stein"],
+	"Cover Type": "Hard",
+	"Subject": "Computer Science",
+	"Pages": 1292
+	}]
+}

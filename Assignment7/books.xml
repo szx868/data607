@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--These are some of my recent favorite books-->
+<books>
+	<book>
+		<book_title>Introduction to Algorithms</book_title>
+		<authors>
+			<author ID="1">Thomas H.Cormen</author>
+			<author ID="2">Charles E.Leiserson</author>
+			<author ID="3">Ronald L.Rivest</author>
+			<author ID="4">Clifford Stein</author>
+		</authors>
+		<cover_type>Hard</cover_type>
+		<subject>Computer Science</subject>
+		<pages>1292</pages>
+	</book>
+	<book>		
+		<book_title>Harry Potter and the Sorcerer's Stone</book_title>
+		<authors>
+			<author ID="1">J. K. Rowling</author>
+		</authors>
+		<cover_type>Hard</cover_type>
+		<subject>Fiction</subject>
+		<pages>256</pages>
+	</book>		
+	<book>		
+		<book_title>New Moon: The Twilight Saga</book_title>
+		<authors>
+			<author ID="1">Stephenie Meyer</author>
+		</authors>
+		<cover_type>Soft</cover_type>
+		<subject>Fiction</subject>
+		<pages>512</pages>
+	</book>		
+</books>
