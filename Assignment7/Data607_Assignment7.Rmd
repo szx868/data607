@@ -1,0 +1,113 @@
+---
+title: "Assignment7_ZhouxinShi"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Pick three of your favorite books on one of your favorite subjects. At least one of the books should have more
+than one author. For each book, include the title, authors, and two or three other attributes that you find
+interesting.
+```{r}
+knitr::opts_chunk$set(warning=FALSE, 
+                      message=FALSE,
+                      tidy=F,
+                      #comment = "",
+                      dev="png", 
+                      dev.args=list(type="cairo"))
+
+
+#create vector with all needed packages
+load_packages <- c("RCurl","prettydoc", "stringr", "dplyr", "knitr", "janitor", "XML", "tidyr", "RJSONIO")
+
+
+t(t(sapply(load_packages, require, character.only = TRUE, quietly = TRUE,  warn.conflicts = FALSE)))
+```
+
+
+Step 1. HTML Table Parsing
+Load data, look at the HTML table & then its data frame
+
+```{r}
+url_html <- getURLContent("https://raw.githubusercontent.com/szx868/data607/master/Assignment7/books2.html")
+
+
+writeLines(url_html)
+```
+```{r}
+my_html_df <- url_html %>% 
+  readHTMLTable(header=TRUE, as.data.frame = TRUE) %>% 
+  data.frame(stringsAsFactors = FALSE) %>% 
+  clean_names() 
+
+colnames(my_html_df) <- str_replace(colnames(my_html_df),"null_", "")
+my_html_df <- my_html_df %>% arrange(desc(book_title))
+kable(my_html_df)
+```
+Step 2. JSON Parsing
+Load data, look at the JSON & then its data frame
+```{r}
+url_json <- getURLContent("https://raw.githubusercontent.com/szx868/data607/master/Assignment7/books.json")
+
+print("Is my JSON valid?")
+```
+
+```{r}
+isValidJSON("https://raw.githubusercontent.com/szx868/data607/master/Assignment7/books.json")
+```
+```{r}
+writeLines(url_json)
+```
+
+```{r}
+my_json_df <- fromJSON(url_json)
+
+my_json_df <- do.call("rbind", lapply(my_json_df$`favorite recent books`, data.frame, stringsAsFactors = F))
+
+my_json_df <- my_json_df %>%  
+  clean_names() %>% 
+  arrange(desc(book_title))
+
+kable(my_json_df, caption = "data frame looks the same as the HTML one.")
+```
+Step 3. XML Parsing
+Load data, look at the XML & then its data frame
+```{r}
+url_XML <- getURLContent("https://raw.githubusercontent.com/szx868/data607/master/Assignment7/books.xml")
+
+writeLines(url_XML)
+```
+```{r}
+my_XML_df <- url_XML %>% 
+  xmlParse() %>% 
+  xmlToDataFrame(stringsAsFactors = FALSE) 
+
+kable(my_XML_df, caption = "This does not look the same as the first 2 data frames. For the book with more than one author, the function concatenated all of them into a single cell. Let's do a little bit of surgery to get the same result.")
+```
+```{r}
+my_XML_df2 <- my_XML_df %>% 
+  mutate(authors = paste(str_replace_all(authors, "([a-z])([A-Z])", "\\1,\\2"))) %>% 
+  separate(authors, c(paste0("author_", 1:4)), sep = ",") %>% 
+  gather(author_num, author, author_1:author_4, na.rm = T) %>% 
+  select(book_title, author, everything(), -author_num) %>% 
+  arrange(desc(book_title)) 
+  
+kable(my_XML_df2, caption = "And now it looks like the other 2 data frames")
+```
+
+
+```{r}
+my_json_df == my_html_df
+
+```
+```{r}
+my_html_df == my_XML_df2
+
+```
+
