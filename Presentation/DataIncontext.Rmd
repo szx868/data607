@@ -1,0 +1,86 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Rselenium 
+
+Many websites are difficult to scrap because they use JavaScript and jQuery to dynamically extract data from the database. For example, on common social media sites such as LinkedIn or Facebook, when you scroll down the page, new content will be loaded and the URL will not change. These sites are difficult to scrap, To simpify scraping task, we can adjust the URL based on a certain system pattern to load a new page.
+
+For example, if we check the Grainger website, we will see that the URL changes systematically, for example.
+https://www.grainger.com/
+
+
+```{r cars}
+library(RSelenium)
+library(tidyverse)
+
+
+cprof <- list(chromeOptions = 
+                list(extensions = 
+                       list(base64enc::base64encode("VPN_PROXY_MASTER.crx"))
+                ))
+
+
+rD <- rsDriver(port = 4458L,extraCapabilities=cprof, browser ="chrome",chromever = "latest")
+remDr <- rD[["client"]]
+remDr$setTimeout(type = 'page load', milliseconds = 120000)
+remDr$setTimeout(type = 'implicit', milliseconds = 120000)
+remDr$navigate("chrome-extension://lnfdmdhmfbimhhpaeocncdlhiodoblbd/popup/popup.html")
+time <- 5
+Sys.sleep(time)
+webElem <- remDr$findElement("css", "body")
+# find button
+morereviews <- remDr$findElement(using = 'css selector', ".start-btn")
+# click button
+morereviews$clickElement()
+# wait
+Sys.sleep(8)
+remDr$setTimeout(type = 'page load', milliseconds = 120000)
+remDr$setTimeout(type = 'implicit', milliseconds = 120000)
+remDr$navigate("https://www.grainger.com/")
+webElem2 <- remDr$findElement("css", "body")
+morereviews2 <- remDr$findElement(using = "name", value = "searchQuery")$sendKeysToElement(list('3d264',key="enter"))
+Sys.sleep(5) # give the page time to fully load
+html <- remDr$getPageSource()[[1]]
+
+```
+
+```{r}
+remDr$close()
+rD$server$stop()
+rm(rD, remDr)
+gc()
+system("taskkill /im java.exe /f", intern=FALSE, ignore.stdout=FALSE)
+```
+
+![image info](capture3.png)
+![image info](capture.png)
+![image info](capture2.png)
+```{r}
+library(rvest)
+library("knitr")
+
+item.desc <- read_html(html) %>% # parse HTML
+  html_nodes(".specifications__description") %>% # extract class nodes with class = "specifications__description"
+  html_text() 
+item.value <- read_html(html) %>% # parse HTML
+  html_nodes(".specifications__value") %>% # extract class nodes with class = "specifications__item"
+  html_text() 
+tech.spec <- cbind(item.desc, item.value)
+tech.spec
+
+
+```
+
+
+
+## Inconclusion
+
+RSelenium provides many other functions, which are not described here. This is an introduction to how Selenium works and how to interact with other common R packages such as rvest. Among other features of Selenium, you can take screenshots, click on specific links or sections on the page, scroll down the page and enter any keyboard strokes into any part of the web page. When combined with classic crawling technology, it has a wide range of uses and can crawl almost any website.
+
+
