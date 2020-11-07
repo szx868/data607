@@ -1,0 +1,37 @@
+---
+title: "Tiktok"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+In less than 2 years, Tiktok went from a “lip-syncing” app in a small fan community to viral App with nearly 800 million active monthly users in 2020. Collectively, TikTok videos tagged with coronavirus have been watched 53 billion times.
+
+
+TikTok calls itself the “destination for short-form mobile videos.” In some ways it’s a bite-size version of YouTube, with videos ranging between five mins and 60 seconds in length. Their target user is wide range, Creators have access to an assortment of filters and effects, as well as a massive music library. Their main goal is to find balance between suggesting content that is relevant to you while also helping you find content and creators that encourage you to explore experiences you might not otherwise see.
+
+‘User-Centric Design’ remains the core of the archetype of Tiktok. In a simple term, TikTok will only recommend the content you would love, from a cold start adjustment to an explicit recommendation for active users. If you click a dancing video, your feed would be customized to the entertainment category initially, then the following up mechanism will trace your behaviors for further analysis, which would eventually provide precise recommendations for you only.
+
+**Recommendation **
+
+In the article “features would make Tiktok better” point out Issue that a randomized feed can leave users with conflicting types of content
+.
+The problem is your interests change from time to time, often even within the same day. Sometimes you are interested in aimlessly watching funny videos, and other times you are interested in learning a new skill. Having these different types of videos show up in your feed in succession can be counterproductive. 
+
+The easiest way to solve this issue is to offer filters (not to be confused with the aesthetic overlays you use on selfies. it referring to the ones that are used to separate content into distinctive categories). The mockup above allows users to access the filters by holding down the ‘For You’ tab.
+
+Today, TikTok says it’s also working on ways to keep a user’s For You page diverse and fresh. That means removing repetitive content, duplicated content, content you have seen before and spam. But it also means making sure you don’t see two videos in a row by the same creator or with the same sound. For safety reasons, the app also will not recommend videos that some may find shocking.
+
+In addition, TikTok will add videos to you For You feed at times that don’t appear to be relevant to your expressed interests or have amassed a huge number of likes. This is part of its attempts to add diversity — by giving users a chance to stumble across new content categories and new creators, and to allow them to “experience new perspectives and ideas”
+
+- Source
+https://towardsdatascience.com/why-tiktok-made-its-user-so-obsessive-the-ai-algorithm-that-got-you-hooked-7895bb1ab423
+
+https://newsroom.tiktok.com/en-us/how-tiktok-recommends-videos-for-you
+
+https://techcrunch.com/2020/06/18/tiktok-explains-how-the-recommendation-system-behind-its-for-you-feed-works/
+https://uxdesign.cc/5-features-that-would-make-tiktok-better-423b2d6afc16
